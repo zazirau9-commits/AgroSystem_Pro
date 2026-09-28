@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroSystem Pro - Ауылшаруашылық Басқару Жүйесі</title>
+    <style>
+        :root {
+            --primary-color: #2e7d32;
+            --primary-light: #e8f5e9;
+            --dark-color: #1b5e20;
+            --bg-color: #f8f9fa;
+            --text-color: #333;
+            --white: #ffffff;
+            --border-color: #dee2e6;
+            --danger-color: #d32f2f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        /* Sidebar Стили */
+        .sidebar {
+            width: 260px;
+            background-color: var(--dark-color);
+            color: var(--white);
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 22px;
+            letter-spacing: 1px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        .menu-category {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 20px 0 10px 5px;
+            color: #a5d6a7;
+            font-weight: bold;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar ul li a {
+            display: block;
+            color: #e8f5e9;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+
+        .sidebar ul li a:hover, .sidebar ul li a.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+            font-weight: bold;
+            padding-left: 20px;
+        }
+
+        /* Негізгі контент аймағы */
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 30px;
+            background-color: var(--bg-color);
+        }
+
+        .page-header {
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--dark-color);
+        }
+
+        /* Бақылау панелінің карточкалары */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .card h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .card .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+
+        /* Беттердің көрінуі */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Формалар мен кестелер стилі */
+        .section-block {
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-header h3 {
+            color: var(--primary-color);
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--dark-color);
+        }
+
+        .btn-excel {
+            background-color: #1f7246;
+            color: var(--white);
+        }
+
+        .btn-excel:hover {
+            background-color: #13492d;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: var(--white);
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
+        .form-inline {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group select {
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* Кесте дизайны */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table th, table td {
+            border: 1px solid var(--border-color);
+            padding: 10px 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        table th {
+            background-color: var(--primary-light);
+            color: var(--dark-color);
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Сол жақ навигациялық мәзір (Sidebar) -->
+    <div class="sidebar">
+        <h2>AgroSystem Pro</h2>
+        <ul>
+            <li><a href="#" class="nav-link active" data-target="dashboard-page">Басты бет</a></li>
+        </ul>
+
+        <div class="menu-category">Мал шаруашылығы</div>
+        <ul>
+            <li><a href="#" class="nav-link" data-target="livestock-page">Мал атауы</a></li>
+            <li><a href="#" class="nav-link" data-target="offspring-page">Малдың төлі</a></li>
+        </ul>
+
+        <div class="menu-category">Ресурстар қорлары</div>
+        <ul>
+            <li><a href="#" class="nav-link" data-target="feed-page">Жем қоры</a></li>
+            <li><a href="#" class="nav-link" data-target="hay-page">Шөп қоры</a></li>
+        </ul>
+
+        <div class="menu-category">Өнім өндірісі</div>
+        <ul>
+            <li><a href="#" class="nav-link" data-target="meat-page">Ет өнімдері</a></li>
+            <li><a href="#" class="nav-link" data-target="milk-page">Сүт өнімдері</a></li>
+            <li><a href="#" class="nav-link" data-target="kefir-page">Айран өнімдері</a></li>
+            <li><a href="#" class="nav-link" data-target="butter-page">Май өнімдері</a></li>
+            <li><a href="#" class="nav-link" data-target="cheese-page">Ірімшік өнімдері</a></li>
+            <li><a href="#" class="nav-link" data-target="qurt-page">Құрт өнімдері</a></li>
+        </ul>
+
+        <div class="menu-category">Қаржы есебі</div>
+        <ul>
+            <li><a href="#" class="nav-link" data-target="income-page">Кіріс бөлімі</a></li>
+            <li><a href="#" class="nav-link" data-target="expense-page">Шығыс бөлімі</a></li>
+        </ul>
+    </div>
+
+    <!-- Оң жақ негізгі жұмыс аймағы -->
+    <div class="main-content">
+
+        <!-- 1. БАСТЫ БЕТ -->
+        <div id="dashboard-page" class="page active">
+            <h1 class="page-header">Шаруашылықтың жалпы көрсеткіштері</h1>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>Жалпы мал басы</h3>
+                    <div class="value" id="total-livestock">0 бас</div>
+                </div>
+                <div class="card">
+                    <h3>Жалпы төл саны</h3>
+                    <div class="value" id="total-offspring">0 бас</div>
+                </div>
+                <div class="card">
+                    <h3>Қамдалған қорлар</h3>
+                    <div class="value" id="total-resources">0 кг</div>
+                </div>
+                <div class="card">
+                    <h3>Таза қаржы балансы</h3>
+                    <div class="value" id="total-balance">0 ₸</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. МАЛ АТАУЫ -->
+        <div id="livestock-page" class="page">
+            <h1 class="page-header">Мал атауы (Түрлері бойынша есеп)</h1>
+            
+            <div class="section-block">
+                <div class="section-header">
+                    <h3>Жылқы есебі</h3>
+                    <button class="btn btn-excel" onclick="exportToExcel('horse-table')">Excel-ге жүктеу</button>
+                </div>
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label>Тұқымы / Сорты</label>
+                        <input type="text" id="horse-breed" placeholder="Мысалы: Қазанат">
+                    </div>
+                    <div class="form-group">
+                        <label>Саны (бас)</label>
+                        <input type="number" id="horse-count" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Күйі / Ерекшелігі</label>
+                        <input type="text" id="horse-status" placeholder="Мысалы: Жақсы">
+                    </div>
+                    <button class="btn btn-primary" onclick="addLivestock('horse')">Жазбаны қосу</button>
+                </div>
+                <table id="horse-table">
+                    <thead>
+                        <tr><th>Тұқымы</th><th>Саны (бас)</th><th>Күйі</th><th>Әрекет</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="section-block">
+                <div class="section-header">
+                    <h3>Сиыр есебі</h3>
+                    <button class="btn btn-excel" onclick="exportToExcel('cow-table')">Excel-ге жүктеу</button>
+                </div>
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label>Тұқымы / Сорты</label>
+                        <input type="text" id="cow-breed" placeholder="Мысалы: Алатау сиыры">
+                    </div>
+                    <div class="form-group">
+                        <label>Саны (бас)</label>
+                        <input type="number" id="cow-count" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Күйі / Ерекшелігі</label>
+                        <input type="text" id="cow-status" placeholder="Мысалы: Сауынды">
+                    </div>
+                    <button class="btn btn-primary" onclick="addLivestock('cow')">Жазбаны қосу</button>
+                </div>
+                <table id="cow-table">
+                    <thead>
+                        <tr><th>Тұқымы</th><th>Саны (бас)</th><th>Күйі</th><th>Әрекет</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="section-block">
+                <div class="section-header">
+                    <h3>Қой есебі</h3>
+                    <button class="btn btn-excel" onclick="exportToExcel('sheep-table')">Excel-ге жүктеу</button>
+                </div>
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label>Тұқымы / Сорты</label>
+                        <input type="text" id="sheep-breed" placeholder="Мысалы: Еділбай қойы">
+                    </div>
+                    <div class="form-group">
+                        <label>Саны (бас)</label>
+                        <input type="number" id="sheep-count" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Күйі / Ерекшелігі</label>
+                        <input type="text" id="sheep-status" placeholder="Мысалы: Бордақыланған">
+                    </div>
+                    <button class="btn btn-primary" onclick="addLivestock('sheep')">Жазбаны қосу</button>
+                </div>
+                <table id="sheep-table">
+                    <thead>
+                        <tr><th>Тұқымы</th><th>Саны (бас)</th><th>Күйі</th><th>Әрекет</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="section-block">
+                <div class="section-header">
+                    <h3>Ешкі есебі</h3>
+                    <button class="btn btn-excel" onclick="exportToExcel('goat-table')">Excel-ге жүктеу</button>
+                </div>
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label>Тұқымы / Сорты</label>
+                        <input type="text" id="goat-breed" placeholder="Мысалы: Angor eshkisi">
+                    </div>
+                    <div class="form-group">
+                        <label>Саны (бас)</label>
+                        <input type="number" id="goat-count" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Күйі / Ерекшелігі</label>
+                        <input type="text" id="goat-status" placeholder="Мысалы: Jundes">
+                    </div>
+                    <button class="btn btn-primary" onclick="addLivestock('goat')">Жазбаны қосу</button>
+                </div>
+                <table id="goat-table">
+                    <thead>
+                        <tr><th>Тұқымы</th><th>Саны (бас)</th><th>Күйі</th><th>Әрекет</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="offspring-page" class="page">
+            <h1 class="page-header">Малдың төлі (Жаңа туылған төлдерді тіркеу)</h1>
+            <div class="section-block">
+                <div class="section-header">
+                    <h3>Төлдердің есеп журналы</h3>
+                    <button class="btn btn-excel" onclick="exportToExcel('offspring-table')">Excel-ге жүктеу</button>
+                </div>
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label>Төл түрі</label>
+                        <select id="offspring-type">
+                            <option value="Құлын (Жылқы төлі)">Құлын (Жылқы төлі)</option>
+                            <option value="Бұзау (Сиыр төлі)">Бұзау (Сиыр төлі)</option>
+                            <option value="Қозы (Қой төлі)">Қозы (Қой төлі)</option>
+                            <option value="Лақ (Ешкі төлі)">Лақ (Ешкі төлі)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Саны (бас)</label>
+                        <input type="number" id="offspring-count" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Туылған мерзімі</label>
+                        <input type="date" id="offspring-date">
+                    </div>
+                    <button class="btn btn-primary" onclick="addOffspring()">Төлді тіркеу</button>
+                </div>
+                <table id="offspring-table">
+                    <thead>
+                        <tr><th>Төл түрі</th><th>Саны (бас)</th><th>Туылған мерзімі</th><th>Әрекет</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="feed-page" class="page">
+            <h1 class="page-header">Жем қорының балансы</h1>
+            <div class="section-block">
+                <div class="section-header">
+                    <h3>Жем кірісі мен жұмсалуын тіркеу</h3>
+                    <button class="btn btn-excel" onclick="exportToExcel('feed-table')">Excel-ге жүктеу</button>
+                </div>
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label>Операция атауы</label>
+                        <input type="text" id="feed-name" placeholder="Мысалы: Арпа сатып алу">
+                    </div>
+                    <div class="form-group">
+                        <label>Салмағы (кг)</label>
+                        <input type="number" id="feed-weight">
+                    </div>
+                    <div class="form-group">
+                        <label>Күні</label>
+                        <input type="date" id="feed-date">
+                    </div>
+                    <button class="btn btn-primary" onclick="addResource('feed')">Сақтау</button>
+                </div>
+                <table id="feed-table">
+                    <thead>
+                        <tr><th>Операция</th><th>Салмағы (кг)</th><th>Күні</th><th>Әрекет</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="hay-page" class="page">
+            <h1 class="page-header">Шөп қорының балансы</h1>
+            <div class="section-block">
+                <div class="section-header">
+                    <h3>Шөп престерін есепке алу</h3>
+                    <button class="btn btn-excel" onclick="exportToExcel('hay-table')">Excel-ге жүктеу</button>
+                </div>
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label>Сипаттамасы</label>
+                        <input type="text" id="hay-name" placeholder="Мысалы: Жоңышқа пресі">
+                    </div>
+                    <div class="form-group">
+                        <label>Салмағы / Мөлшері (кг)</label>
+                        <input type="number" id="hay-weight">
+                    </div>
+                    <div class="form-group">
+                        <label>Күні</label>
+                        <input type="date" id="hay-date">
+                    </div>
+                    <button class="btn btn-primary" onclick="addResource('hay')">Сақтау</button>
+                </div>
+                <table id="hay-table">
+                    <thead>
+                        <tr><th>Сипаттамасы</th><th>Мөлшері (кг)</th><th>Күні</th><th>Әрекет</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="meat-page" class="page">
+            <h1 class="page-header">Ет өнімдерінің өндірісі</h1>
+            <div class="section-block">
+                <div class="section-header">
+                    <h3>Дайындалған ет өнімдері журналы</h3>
+                    <button class="btn btn-excel" onclick="exportToExcel('meat-table')">Excel-ге жүктеу</button>
+                </div>
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label>Ет өнімінің түрі</label>
+                        <input type="text" id="meat-name" placeholder="Мысалы: Сиыр еті, Қазы, Сүр ет">
+                    </div>
+                    <div class="form-group">
+                        <label>Салмағы (кг)</label>
+                        <input type="number" id="meat-val" min="0.1" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>Күні</label>
+                        <input type="date" id="meat-date">
+                    </div>
+                    <button class="btn btn-primary" onclick="addProduct('meat', 'кг')">Сақтау</button>
+                </div>
+                <table id="meat-table">
+                    <thead>
+                        <tr><th>Атауы</th><th>Мөлшері</th><th>Күні</th><th>Әрекет</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="milk-page" class="page">
+            <h1 class="page-header">Сүт өндірісі</h1>
+            <div class="section-block">
+                <div class="section-header"><h3>Сауылған таза сүт журналы</h3><button class="btn btn-excel" onclick="exportToExcel('milk-table')">Excel-ге жүктеу</button></div>
+                <div class="form-inline">
+                    <div class="form-group"><label>Мал түрінен</label><input type="text" id="milk-name" placeholder="Мысалы: Сиыр сүті"></div>
+                    <div class="form-group"><label>Көлемі (литр)</label><input type="number" id="milk-val"></div>
+                    <div class="form-group"><label>Күні</label><input type="date" id="milk-date"></div>
+                    <button class="btn btn-primary" onclick="addProduct('milk', 'литр')">Сақтау</button>
+                </div>
+                <table id="milk-table"><thead><tr><th>Атауы</th><th>Мөлшері</th><th>Күні</th><th>Әрекет</th></tr></thead><tbody></tbody></table>
+            </div>
+        </div>
+
+        <div id="kefir-page" class="page">
+            <h1 class="page-header">Айран өнімдері</h1>
+            <div class="section-block">
+                <div class="section-header"><h3>Айран ашыту есебі</h3><button class="btn btn-excel" onclick="exportToExcel('kefir-table')">Excel-ге жүктеу</button></div>
+                <div class="form-inline">
+                    <div class="form-group"><label>Сипаттамасы</label><input type="text" id="kefir-name" placeholder="Мысалы: Сиыр айраны"></div>
+                    <div class="form-group"><label>Көлемі (литр)</label><input type="number" id="kefir-val"></div>
+                    <div class="form-group"><label>Күні</label><input type="date" id="kefir-date"></div>
+                    <button class="btn btn-primary" onclick="addProduct('kefir', 'литр')">Сақтау</button>
+                </div>
+                <table id="kefir-table"><thead><tr><th>Атауы</th><th>Мөлшері</th><th>Күні</th><th>Әрекет</th></tr></thead><tbody></tbody></table>
+            </div>
+        </div>
+
+        <div id="butter-page" class="page">
+            <h1 class="page-header">Май өнімдері (Сары май / Шайқалған май)</h1>
+            <div class="section-block">
+                <div class="section-header"><h3>Май өндірісі журналы</h3><button class="btn btn-excel" onclick="exportToExcel('butter-table')">Excel-ге жүктеу</button></div>
+                <div class="form-inline">
+                    <div class="form-group"><label>Май түрі</label><input type="text" id="butter-name" placeholder="Мысалы: Сары май"></div>
+                    <div class="form-group"><label>Салмағы (кг)</label><input type="number" id="butter-val"></div>
+                    <div class="form-group"><label>Күні</label><input type="date" id="butter-date"></div>
+                    <button class="btn btn-primary" onclick="addProduct('butter', 'кг')">Сақтау</button>
+                </div>
+                <table id="butter-table"><thead><tr><th>Атауы</th><th>Мөлшері</th><th>Күні</th><th>Әрекет</th></tr></thead><tbody></tbody></table>
+            </div>
+        </div>
+
+        <div id="cheese-page" class="page">
+            <h1 class="page-header">Ірімшік өнімдері</h1>
+            <div class="section-block">
+                <div class="section-header"><h3>Дайындалған ірімшіктер тізімі</h3><button class="btn btn-excel" onclick="exportToExcel('cheese-table')">Excel-ге жүктеу</button></div>
+                <div class="form-inline">
+                    <div class="form-group"><label>Тұқымы / Түрі</label><input type="text" id="cheese-name" placeholder="Мысалы: Ешкі ірімшігі"></div>
+                    <div class="form-group"><label>Салмағы (кг)</label><input type="number" id="cheese-val"></div>
+                    <div class="form-group"><label>Күні</label><input type="date" id="cheese-date"></div>
+                    <button class="btn btn-primary" onclick="addProduct('cheese', 'кг')">Сақтау</button>
+                </div>
+                <table id="cheese-table"><thead><tr><th>Атауы</th><th>Мөлшері</th><th>Күні</th><th>Әрекет</th></tr></thead><tbody></tbody></table>
+            </div>
+        </div>
+
+        <div id="qurt-page" class="page">
+            <h1 class="page-header">Құрт өнімдері</h1>
+            <div class="section-block">
+                <div class="section-header"><h3>Құрт қайнату есеп кітабы</h3><button class="btn btn-excel" onclick="exportToExcel('qurt-table')">Excel-ге жүктеу</button></div>
+                <div class="form-inline">
+                    <div class="form-group"><label>Құрт сипаттамасы</label><input type="text" id="qurt-name" placeholder="Мысалы: Тұзды майлы құрт"></div>
+                    <div class="form-group"><label>Мөлшері (дана немесе кг)</label><input type="text" id="qurt-val" placeholder="Мысалы: 50 дана"></div>
+                    <div class="form-group"><label>Күні</label><input type="date" id="qurt-date"></div>
+                    <button class="btn btn-primary" onclick="addProduct('qurt', '')">Сақтау</button>
+                </div>
+                <table id="qurt-table"><thead><tr><th>Атауы</th><th>Мөлшері</th><th>Күні</th><th>Әрекет</th></tr></thead><tbody></tbody></table>
+            </div>
+        </div>
+
+        <div id="income-page" class="page">
+            <h1 class="page-header">Қаржылық кірістерді тіркеу</h1>
+            <div class="section-block">
+                <div class="section-header">
+                    <h3>Кіріс операцияларының журналы</h3>
+                    <button class="btn btn-excel" onclick="exportToExcel('income-table')">Excel-ге жүктеу</button>
+                </div>
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label>Кіріс көзі / Мақсаты</label>
+                        <input type="text" id="income-name" placeholder="Мысалы: Ет сатудан түскен пайда">
+                    </div>
+                    <div class="form-group">
+                        <label>Сомасы (₸)</label>
+                        <input type="number" id="income-amount" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Күні</label>
+                        <input type="date" id="income-date">
+                    </div>
+                    <button class="btn btn-primary" onclick="addFinance('income')">Кірісті қосу</button>
+                </div>
+                <table id="income-table">
+                    <thead>
+                        <tr><th>Қаржы көзі</th><th>Сомасы (₸)</th><th>Күні</th><th>Әрекет</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="expense-page" class="page">
+            <h1 class="page-header">Қаржылық шығыстарды тіркеу</h1>
+            <div class="section-block">
+                <div class="section-header">
+                    <h3>Шығыс операцияларының журналы</h3>
+                    <button class="btn btn-excel" onclick="exportToExcel('expense-table')">Excel-ге жүктеу</button>
+                </div>
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label>Шығыс мақсаты / Төлем</label>
+                        <input type="text" id="expense-name" placeholder="Мысалы: Жем-шөп сатып алу шығыны">
+                    </div>
+                    <div class="form-group">
+                        <label>Сомасы (₸)</label>
+                        <input type="number" id="expense-amount" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Күні</label>
+                        <input type="date" id="expense-date">
+                    </div>
+                    <button class="btn btn-primary" onclick="addFinance('expense')">Шығысты қосу</button>
+                </div>
+                <table id="expense-table">
+                    <thead>
+                        <tr><th>Шығыс мақсаты</th><th>Сомасы (₸)</th><th>Күні</th><th>Әрекет</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+    <script>
+        // Мәліметтерді сақтайтын орталық қойма (State)
+        let dataStore = {
+            livestock: { horse: [], cow: [], sheep: [], goat: [] },
+            offspring: [],
+            resources: { feed: [], hay: [] },
+            products: { meat: [], milk: [], kefir: [], butter: [], cheese: [], qurt: [] },
+            finance: { income: [], expense: [] }
+        };
+
+        // Барлық дата таңдау өрістеріне бүгінгі күнді қою
+        document.querySelectorAll('input[type="date"]').forEach(input => {
+            input.value = new Date().toISOString().split('T')[0];
+        });
+
+        // Навигация (Беттерді ауыстыру логикасы)
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                
+                this.classList.add('active');
+                const targetId = this.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+
+        // БАСТЫ БЕТТІ ЖАҢАРТУ ФУНКЦИЯСЫ
+        function updateDashboard() {
+            let totalLivestock = 0;
+            for(let key in dataStore.livestock) {
+                dataStore.livestock[key].forEach(item => totalLivestock += parseInt(item.count || 0));
+            }
+            document.getElementById('total-livestock').innerText = totalLivestock + " бас";
+
+            let totalOffspring = 0;
+            dataStore.offspring.forEach(item => totalOffspring += parseInt(item.count || 0));
+            document.getElementById('total-offspring').innerText = totalOffspring + " бас";
+
+            let totalRes = 0;
+            for(let key in dataStore.resources) {
+                dataStore.resources[key].forEach(item => totalRes += parseFloat(item.weight || 0));
+            }
+            document.getElementById('total-resources').innerText = totalRes + " кг";
+
+            let totalInc = 0;
+            let totalExp = 0;
+            dataStore.finance.income.forEach(item => totalInc += parseFloat(item.amount || 0));
+            dataStore.finance.expense.forEach(item => totalExp += parseFloat(item.amount || 0));
+            let balance = totalInc - totalExp;
+            document.getElementById('total-balance').innerText = balance.toLocaleString() + " ₸";
+        }
+
+        // КЕСТЕНІ ЖАҢАРТУ
+        function renderTable(tableId, dataArray, deleteCallbackName, typeKey = null) {
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            tbody.innerHTML = '';
+            
+            dataArray.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                let cells = '';
+                
+                for(let key in item) {
+                    cells += `<td>${item[key]}</td>`;
+                }
+                
+                let param = typeKey ? `'${typeKey}', ${index}` : index;
+                cells += `<td><button class="btn btn-danger" onclick="${deleteCallbackName}(${param})">Өшіру</button></td>`;
+                tr.innerHTML = cells;
+                tbody.appendChild(tr);
+            });
+            updateDashboard();
+        }
+
+        // МӘЛІМЕТ ҚОСУ ЖӘНЕ ӨШІРУ ОПЕРАЦИЯЛАРЫ
+        function addLivestock(type) {
+            const breed = document.getElementById(`${type}-breed`).value;
+            const count = document.getElementById(`${type}-count`).value;
+            const status = document.getElementById(`${type}-status`).value;
+
+            if(!breed || !count) return alert('Тұқымы мен санын енгізіңіз!');
+
+            dataStore.livestock[type].push({ breed, count: parseInt(count), status });
+            document.getElementById(`${type}-breed`).value = '';
+            document.getElementById(`${type}-count`).value = '';
+            document.getElementById(`${type}-status`).value = '';
+
+            renderTable(`${type}-table`, dataStore.livestock[type], 'deleteLivestock', type);
+        }
+
+        function deleteLivestock(type, index) {
+            dataStore.livestock[type].splice(index, 1);
+            renderTable(`${type}-table`, dataStore.livestock[type], 'deleteLivestock', type);
+        }
+
+        function addOffspring() {
+            const type = document.getElementById('offspring-type').value;
+            const count = document.getElementById('offspring-count').value;
+            const date = document.getElementById('offspring-date').value;
+
+            if(!count || !date) return alert('Барлық өрісті толтырыңыз!');
+
+            dataStore.offspring.push({ type, count: parseInt(count), date });
+            document.getElementById('offspring-count').value = '';
+
+            renderTable('offspring-table', dataStore.offspring, 'deleteOffspring');
+        }
+
+        function deleteOffspring(index) {
+            dataStore.offspring.splice(index, 1);
+            renderTable('offspring-table', dataStore.offspring, 'deleteOffspring');
+        }
+
+        function addResource(type) {
+            const name = document.getElementById(`${type}-name`).value;
+            const weight = document.getElementById(`${type}-weight`).value;
+            const date = document.getElementById(`${type}-date`).value;
+
+            if(!name || !weight) return alert('Атауы мен салмағын жазыңыз!');
+
+            dataStore.resources[type].push({ name, weight: parseFloat(weight), date });
+            document.getElementById(`${type}-name`).value = '';
+            document.getElementById(`${type}-weight`).value = '';
+
+            renderTable(`${type}-table`, dataStore.resources[type], 'deleteResource', type);
+        }
+
+        function deleteResource(type, index) {
+            dataStore.resources[type].splice(index, 1);
+            renderTable(`${type}-table`, dataStore.resources[type], 'deleteResource', type);
+        }
+
+        function addProduct(type, unit) {
+            const name = document.getElementById(`${type}-name`).value;
+            let val = document.getElementById(`${type}-val`).value;
+            const date = document.getElementById(`${type}-date`).value;
+
+            if(!name || !val) return alert('Мәліметтерді толық енгізіңіз!');
+            
+            let displayVal = unit ? `${val} ${unit}` : val;
+
+            dataStore.products[type].push({ name, val: displayVal, date });
+            document.getElementById(`${type}-name`).value = '';
+            document.getElementById(`${type}-val`).value = '';
+
+            renderTable(`${type}-table`, dataStore.products[type], 'deleteProduct', type);
+        }
+
+        function deleteProduct(type, index) {
+            dataStore.products[type].splice(index, 1);
+            renderTable(`${type}-table`, dataStore.products[type], 'deleteProduct', type);
+        }
+
+        function addFinance(type) {
+            const name = document.getElementById(`${type}-name`).value;
+            const amount = document.getElementById(`${type}-amount`).value;
+            const date = document.getElementById(`${type}-date`).value;
+
+            if(!name || !amount) return alert('Мақсаты мен сомасын енгізіңіз!');
+
+            dataStore.finance[type].push({ name, amount: parseFloat(amount), date });
+            document.getElementById(`${type}-name`).value = '';
+            document.getElementById(`${type}-amount`).value = '';
+
+            renderTable(`${type}-table`, dataStore.finance[type], 'deleteFinance', type);
+        }
+
+        function deleteFinance(type, index) {
+            dataStore.finance[type].splice(index, 1);
+            renderTable(`${type}-table`, dataStore.finance[type], 'deleteFinance', type);
+        }
+
+        // EXCEL-ГЕ ЖҮКТЕУ
+        function exportToExcel(tableId) {
+            let table = document.getElementById(tableId);
+            if (!table || table.rows.length <= 1) {
+                alert('Экспорттау үшін кестеде мәлімет жоқ!');
+                return;
+            }
+            
+            let html = table.outerHTML;
+            html = html.replace(/<th>Әрекет<\/th>/g, '')
+                       .replace(/<td><button[^>]*>.*?<\/button><\/td>/g, '');
+
+            let blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = `${tableId}_export.xls`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
